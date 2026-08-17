@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chiemeka's Build</title>
+<meta name="apple-mobile-web-app-title" content="Chiemeka's Build">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#10141B">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2310141B'/%3E%3Ctext x='50' y='66' font-size='55' text-anchor='middle'%3E%F0%9F%96%A5%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2310141B'/%3E%3Ctext x='50' y='66' font-size='55' text-anchor='middle'%3E%F0%9F%96%A5%EF%B8%8F%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:#10141B;
+    --panel:#171D27;
+    --panel-raised:#1D2430;
+    --line:#262E3B;
+    --pcb-green:#3FA66F;
+    --pcb-green-soft:#3FA66F33;
+    --signal-amber:#E3A63E;
+    --alert-coral:#E0584A;
+    --alert-coral-soft:#E0584A26;
+    --circuit-teal:#4FD1C7;
+    --text-hi:#F1F3F5;
+    --text-mid:#9AA5B1;
+    --text-dim:#5F6A78;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg-void);
+    background-image:
+      radial-gradient(circle at 15% 0%, #1A2230 0%, transparent 45%),
+      radial-gradient(circle at 100% 30%, #16202233 0%, transparent 50%);
+    color:var(--text-hi);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:28px 16px 80px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  .display{font-family:'Space Grotesk',sans-serif;}
+
+  /* Header */
+  header{margin-bottom:28px;}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--circuit-teal); margin-bottom:6px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700; font-size:28px; margin:0 0 4px;
+    letter-spacing:-.01em;
+  }
+  .subhead{color:var(--text-mid); font-size:14px; margin:0;}
+
+  /* Hero balance card */
+  .hero{
+    background:linear-gradient(180deg,var(--panel-raised),var(--panel));
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:26px 24px;
+    margin-bottom:20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(90deg, transparent 0, transparent 24px, #ffffff05 24px, #ffffff05 25px, transparent 25px),
+      linear-gradient(0deg, transparent 0, transparent 24px, #ffffff05 24px, #ffffff05 25px, transparent 25px);
+    background-size:25px 25px;
+    pointer-events:none;
+  }
+  .hero-top{display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:14px; position:relative;}
+  .balance-figure{font-size:52px; font-weight:700; line-height:1;}
+  .balance-figure .goal{font-size:22px; color:var(--text-dim); font-weight:500;}
+  .balance-label{font-size:12px; color:var(--text-mid); text-transform:uppercase; letter-spacing:.1em; margin-bottom:6px;}
+  .countdown-chip{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:8px 14px;
+    font-size:12.5px;
+    color:var(--text-mid);
+    white-space:nowrap;
+  }
+  .countdown-chip strong{color:var(--signal-amber); font-family:'JetBrains Mono',monospace;}
+
+  .progress-track{
+    margin-top:20px;
+    height:12px;
+    background:#0C0F15;
+    border-radius:999px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    position:relative;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg,var(--pcb-green),var(--circuit-teal));
+    border-radius:999px;
+    transition:width .6s cubic-bezier(.2,.8,.2,1);
+    width:0%;
+  }
+  .progress-meta{display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-dim); margin-top:8px; font-family:'JetBrains Mono',monospace;}
+
+  /* The Build - signature component row */
+  .build-section{margin-bottom:24px;}
+  .section-title{
+    font-family:'Space Grotesk',sans-serif;
+    font-size:14px; font-weight:600;
+    color:var(--text-hi);
+    margin:0 0 3px;
+  }
+  .section-sub{font-size:12.5px; color:var(--text-mid); margin:0 0 14px;}
+  .build-row{
+    display:grid;
+    grid-template-columns:repeat(6,1fr);
+    gap:8px;
+  }
+  .part{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 8px 12px;
+    text-align:center;
+    transition:border-color .3s, box-shadow .3s, transform .3s;
+  }
+  .part.unlocked{
+    border-color:var(--pcb-green);
+    box-shadow:0 0 0 1px var(--pcb-green-soft), 0 0 24px -8px var(--pcb-green-soft);
+  }
+  .part-icon{font-size:20px; margin-bottom:6px; opacity:.35; filter:grayscale(1);}
+  .part.unlocked .part-icon{opacity:1; filter:none;}
+  .part-name{font-size:10.5px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.04em;}
+  .part.unlocked .part-name{color:var(--pcb-green);}
+  .part-thresh{font-size:10px; color:var(--text-dim); margin-top:2px; font-family:'JetBrains Mono',monospace;}
+
+  /* Layout columns */
+  .columns{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:720px){ .columns{grid-template-columns:1fr;} .build-row{grid-template-columns:repeat(3,1fr);} .balance-figure{font-size:40px;} }
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:18px;
+  }
+
+  /* Form */
+  label{display:block; font-size:11.5px; color:var(--text-mid); margin:0 0 5px; text-transform:uppercase; letter-spacing:.05em;}
+  .field{margin-bottom:14px;}
+  select,input[type=text],input[type=number],input[type=date]{
+    width:100%;
+    background:var(--panel-raised);
+    border:1px solid var(--line);
+    color:var(--text-hi);
+    border-radius:8px;
+    padding:9px 10px;
+    font-size:14px;
+    font-family:'Inter',sans-serif;
+  }
+  select:focus,input:focus,button:focus-visible,.type-btn:focus-visible{
+    outline:2px solid var(--circuit-teal);
+    outline-offset:1px;
+  }
+  .type-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:14px;}
+  .type-btn{
+    background:var(--panel-raised);
+    border:1px solid var(--line);
+    color:var(--text-mid);
+    border-radius:8px;
+    padding:10px 8px;
+    font-size:12.5px;
+    cursor:pointer;
+    text-align:left;
+    font-family:'Inter',sans-serif;
+    transition:border-color .2s, color .2s, background .2s;
+  }
+  .type-btn.active{
+    border-color:var(--circuit-teal);
+    color:var(--text-hi);
+    background:#4FD1C71A;
+  }
+  .type-btn .tb-icon{margin-right:6px;}
+  .row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .stepper{display:flex; align-items:center; gap:8px;}
+  .stepper button{
+    width:34px; height:34px; border-radius:8px;
+    background:var(--panel-raised); border:1px solid var(--line); color:var(--text-hi);
+    font-size:16px; cursor:pointer;
+  }
+  .stepper input{text-align:center; width:60px;}
+  .preview-delta{
+    margin-top:2px; font-size:13px; font-family:'JetBrains Mono',monospace;
+  }
+  .submit-btn{
+    width:100%;
+    background:linear-gradient(180deg,var(--pcb-green),#2E8A5A);
+    color:#08130D;
+    border:none;
+    border-radius:9px;
+    padding:12px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    margin-top:6px;
+    font-family:'Space Grotesk',sans-serif;
+  }
+  .submit-btn:hover{filter:brightness(1.08);}
+  .submit-btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  /* Ledger */
+  .ledger-list{max-height:520px; overflow-y:auto; padding-right:4px;}
+  .ledger-empty{color:var(--text-dim); font-size:13px; padding:20px 0; text-align:center;}
+  .entry{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    padding:10px 0; border-bottom:1px solid var(--line);
+    animation:slideIn .35s ease;
+  }
+  @keyframes slideIn{from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:translateY(0);}}
+  .entry:last-child{border-bottom:none;}
+  .entry-left{display:flex; gap:10px; align-items:flex-start;}
+  .entry-icon{font-size:15px; margin-top:1px;}
+  .entry-label{font-size:13.5px; color:var(--text-hi);}
+  .entry-note{font-size:11.5px; color:var(--text-dim); margin-top:2px;}
+  .entry-date{font-size:10.5px; color:var(--text-dim); font-family:'JetBrains Mono',monospace; margin-top:2px;}
+  .entry-right{text-align:right; flex-shrink:0; padding-left:10px;}
+  .delta-chip{
+    font-family:'JetBrains Mono',monospace; font-size:13.5px; font-weight:700;
+  }
+  .delta-pos{color:var(--pcb-green);}
+  .delta-neg{color:var(--alert-coral);}
+  .delta-zero{color:var(--text-dim);}
+  .entry-pct{font-size:10px; color:var(--text-dim); margin-top:2px;}
+  .del-btn{
+    background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:11px;
+    margin-top:4px; padding:0; text-decoration:underline;
+  }
+  .del-btn:hover{color:var(--alert-coral);}
+
+  /* Settings */
+  .settings-toggle{
+    background:none; border:1px solid var(--line); color:var(--text-mid);
+    border-radius:8px; padding:7px 12px; font-size:12px; cursor:pointer;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .settings-panel{
+    margin-top:16px; display:none;
+  }
+  .settings-panel.open{display:block;}
+  .settings-grid{display:grid; grid-template-columns:1fr auto; gap:8px 12px; align-items:center; font-size:13px;}
+  .settings-grid label{margin:0; text-transform:none; letter-spacing:0; color:var(--text-hi); font-size:13px;}
+  .settings-grid input{width:80px; text-align:right;}
+  .settings-save{margin-top:14px;}
+  .footer-note{color:var(--text-dim); font-size:11.5px; text-align:center; margin-top:24px; line-height:1.6;}
+
+  /* Lock gate */
+  .card-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .lock-btn{
+    background:var(--panel-raised); border:1px solid var(--line); color:var(--text-mid);
+    border-radius:8px; padding:6px 11px; font-size:11.5px; cursor:pointer; white-space:nowrap;
+    font-family:'JetBrains Mono',monospace;
+  }
+  .lock-btn.is-unlocked{border-color:var(--pcb-green); color:var(--pcb-green);}
+  .lock-gate{
+    text-align:center; padding:28px 10px; color:var(--text-mid); font-size:13px;
+  }
+  .lock-gate .lg-icon{font-size:22px; margin-bottom:8px;}
+  .pin-row{display:flex; gap:8px; margin-top:12px; justify-content:center;}
+  .pin-row input{width:110px; text-align:center; letter-spacing:.2em;}
+  .pin-row button{
+    background:var(--circuit-teal); color:#08181A; border:none; border-radius:8px;
+    padding:0 16px; font-size:13px; font-weight:600; cursor:pointer;
+  }
+  .pin-error{color:var(--alert-coral); font-size:11.5px; margin-top:8px; min-height:14px;}
+  .locked-note{font-size:11px; color:var(--text-dim); text-align:center; margin-top:10px;}
+  .del-btn:disabled{display:none;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Chiemeka's Reward Tracker</div>
+    <h1>The Build</h1>
+    <p class="subhead">Earn it, week by week. Every grade, every day on time, every assignment turned in — it all builds toward the desktop.</p>
+  </header>
+
+  <div class="hero">
+    <div class="hero-top">
+      <div>
+        <div class="balance-label">Current balance</div>
+        <div class="balance-figure mono" id="balanceFigure">$0<span class="goal">/ $500</span></div>
+      </div>
+      <div class="countdown-chip" id="countdownChip">— days to Thanksgiving</div>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-meta">
+      <span id="progressPct">0% of goal</span>
+      <span id="progressRemaining">$500 to go</span>
+    </div>
+  </div>
+
+  <div class="build-section">
+    <p class="section-title">Rig status</p>
+    <p class="section-sub">Each part unlocks as the balance crosses its threshold.</p>
+    <div class="build-row" id="buildRow"></div>
+  </div>
+
+  <div class="columns">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <p class="section-title">Log something</p>
+          <p class="section-sub">Add this week's wins or flags. Points post instantly.</p>
+        </div>
+        <button class="lock-btn" id="lockToggle">🔒 Dad only</button>
+      </div>
+
+      <div id="lockGateArea"></div>
+
+      <div id="logFormArea">
+        <div class="type-grid" id="typeGrid"></div>
+
+        <div id="dynamicFields"></div>
+
+        <div class="field">
+          <label for="noteInput">Note (optional)</label>
+          <input type="text" id="noteInput" placeholder="e.g. Math — Ch. 4 worksheet">
+        </div>
+        <div class="field">
+          <label for="dateInput">Date</label>
+          <input type="date" id="dateInput">
+        </div>
+
+        <div class="preview-delta" id="previewDelta"></div>
+        <button class="submit-btn" id="submitBtn">Add to ledger</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="section-title">Activity ledger</p>
+      <p class="section-sub">Newest first. Tap delete if you logged something by mistake.</p>
+      <div class="ledger-list" id="ledgerList"><div class="ledger-empty">Nothing logged yet — add the first entry.</div></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;" id="settingsCard">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <p class="section-title" style="margin:0;">Point values</p>
+      <button class="settings-toggle" id="settingsToggle">Adjust ▾</button>
+    </div>
+    <p class="locked-note" id="settingsLockedNote" style="display:none;">Unlock "Log something" above to edit these.</p>
+    <div class="settings-panel" id="settingsPanel">
+      <div class="settings-grid" id="settingsGrid"></div>
+      <div class="field" style="margin-top:14px;">
+        <label for="cfg-pin">Dad PIN (change it here)</label>
+        <input type="text" id="cfg-pin" inputmode="numeric" maxlength="8">
+      </div>
+      <button class="submit-btn settings-save" id="settingsSave" style="max-width:220px;">Save values</button>
+    </div>
+  </div>
+
+  <p class="footer-note">Goal target: $500 desktop by Thanksgiving (Nov 26, 2026). Values are guidelines — Dad can adjust them anytime in "Point values."</p>
+</div>
+
+<script type="module">
+// ============================================================
+// FIREBASE CONFIG — paste the values from your Firebase project
+// (Project settings ⚙️ → General → Your apps → SDK setup and
+// configuration → Config). Every field below must be filled in.
+// ============================================================
+const firebaseConfig = {
+  apiKey: "AIzaSyDYhYJPyiOyv49-B5fKDCubrM5zQVjcfbk",
+  authDomain: "chiemeka-reward-tracker.firebaseapp.com",
+  databaseURL: "https://chiemeka-reward-tracker-default-rtdb.firebaseio.com",
+  projectId: "chiemeka-reward-tracker",
+  storageBucket: "chiemeka-reward-tracker.firebasestorage.app",
+  messagingSenderId: "790853394097",
+  appId: "1:790853394097:web:238410040750539a3b0c90"
+};
+// ============================================================
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getDatabase, ref, onValue, push, set, update, remove
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-database.js";
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const DATA_PATH = 'chiemekaBuild';
+
+(function(){
+  const GOAL = 500;
+  const THANKSGIVING = new Date('2026-11-26T00:00:00');
+
+  const DEFAULT_CONFIG = {
+    onTimeAssignment: 1,
+    missingAssignment: -3,
+    tardy: -1,
+    absence: -2,
+    grade90: 5,
+    grade80: 3,
+    grade70: 0,
+    gradeBelow70: -5,
+    flagMinor: -5,
+    flagFormal: -15,
+    flagMajor: -100,
+    perfectWeekBonus: 5,
+    missedBusToSchool: -30,
+    missedBusHome: -25
+  };
+
+  const CONFIG_LABELS = {
+    onTimeAssignment: 'On-time assignment',
+    missingAssignment: 'Missing assignment',
+    tardy: 'Tardy',
+    absence: 'Unexcused absence',
+    grade90: 'Grade 90+',
+    grade80: 'Grade 80–89',
+    grade70: 'Grade 70–79',
+    gradeBelow70: 'Grade below 70',
+    flagMinor: 'Teacher flag — minor (step 1 warning)',
+    flagFormal: 'Teacher flag — formal referral',
+    flagMajor: 'Major disciplinary action (suspension/ALC)',
+    perfectWeekBonus: 'Perfect week bonus (no tardies/absences/missing work)',
+    missedBusToSchool: 'Missed bus — going to school',
+    missedBusHome: 'Missed bus — returning home'
+  };
+
+  const TYPES = [
+    { id:'onTime', icon:'✅', label:'On-time assignment', kind:'count', cfgKey:'onTimeAssignment' },
+    { id:'missing', icon:'📄', label:'Missing assignment', kind:'count', cfgKey:'missingAssignment' },
+    { id:'tardy', icon:'⏰', label:'Tardy', kind:'count', cfgKey:'tardy' },
+    { id:'absence', icon:'🚫', label:'Absence', kind:'count', cfgKey:'absence' },
+    { id:'grade', icon:'🎯', label:'Grade entered', kind:'grade' },
+    { id:'flag', icon:'⚠️', label:'Teacher flag', kind:'flag' },
+    { id:'bonus', icon:'🏆', label:'Perfect week bonus', kind:'bonus', cfgKey:'perfectWeekBonus' },
+    { id:'busToSchool', icon:'🚌', label:'Missed bus — to school', kind:'count', cfgKey:'missedBusToSchool' },
+    { id:'busHome', icon:'🚌', label:'Missed bus — returning home', kind:'count', cfgKey:'missedBusHome' }
+  ];
+
+  const PARTS = [
+    {name:'Case', icon:'🖥️'},
+    {name:'Mobo', icon:'🔌'},
+    {name:'CPU', icon:'♟️'},
+    {name:'RAM', icon:'📶'},
+    {name:'GPU', icon:'🎮'},
+    {name:'Display', icon:'🖼️'}
+  ];
+
+  let state = { entries: [], config: { ...DEFAULT_CONFIG }, pin: '2468' };
+  let activeType = 'onTime';
+  let unlocked = false; // resets every page load — never persisted
+
+  const $ = (id) => document.getElementById(id);
+
+  function startLiveSync(){
+    const dataRef = ref(db, DATA_PATH);
+    onValue(dataRef, (snapshot)=>{
+      const val = snapshot.val() || {};
+      const entriesObj = val.entries || {};
+      state.entries = Object.keys(entriesObj).map(key=>({ id: key, ...entriesObj[key] }));
+      state.config = { ...DEFAULT_CONFIG, ...(val.config || {}) };
+      state.pin = (val.config && val.config.pin) || '2468';
+      render();
+    }, (err)=>{
+      console.error('Firebase read failed', err);
+      $('lockGateArea').innerHTML = '<div class="lock-gate">Could not connect. Check the Firebase config values and database rules.</div>';
+    });
+  }
+
+  async function addEntryToDb(entryData){
+    await push(ref(db, DATA_PATH + '/entries'), entryData);
+  }
+
+  async function deleteEntryFromDb(id){
+    await remove(ref(db, DATA_PATH + '/entries/' + id));
+  }
+
+  async function saveConfigToDb(newConfig){
+    await update(ref(db, DATA_PATH + '/config'), newConfig);
+  }
+
+  function balance(){
+    return state.entries.reduce((sum,e)=>sum+e.delta,0);
+  }
+
+  function fmtMoney(n){
+    const sign = n < 0 ? '-' : '';
+    return sign + '$' + Math.abs(Math.round(n));
+  }
+
+  function daysUntilThanksgiving(){
+    const now = new Date();
+    const diff = Math.ceil((THANKSGIVING - now) / (1000*60*60*24));
+    return diff;
+  }
+
+  function renderHero(){
+    const bal = balance();
+    $('balanceFigure').innerHTML = fmtMoney(bal) + '<span class="goal">/ $' + GOAL + '</span>';
+    const pct = Math.max(0, Math.min(100, (bal/GOAL)*100));
+    $('progressFill').style.width = pct + '%';
+    $('progressPct').textContent = Math.round(pct) + '% of goal';
+    const remaining = Math.max(0, GOAL - bal);
+    $('progressRemaining').textContent = remaining > 0 ? fmtMoney(remaining) + ' to go' : 'Goal reached! 🎉';
+    const days = daysUntilThanksgiving();
+    $('countdownChip').innerHTML = days >= 0
+      ? '<strong>' + days + '</strong> days to Thanksgiving'
+      : 'Thanksgiving has passed';
+  }
+
+  function renderBuild(){
+    const bal = Math.max(0, balance());
+    const per = GOAL / PARTS.length;
+    const row = $('buildRow');
+    row.innerHTML = PARTS.map((p,i)=>{
+      const threshold = Math.round(per*(i+1));
+      const unlocked = bal >= per*(i+1) - 0.001;
+      return '<div class="part ' + (unlocked?'unlocked':'') + '">' +
+        '<div class="part-icon">'+p.icon+'</div>' +
+        '<div class="part-name">'+p.name+'</div>' +
+        '<div class="part-thresh">$'+threshold+'</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function typeMeta(id){ return TYPES.find(t=>t.id===id) || { icon:'•', label:id || 'Entry', kind:'count' }; }
+
+  function renderTypeGrid(){
+    $('typeGrid').innerHTML = TYPES.map(t=>
+      '<button type="button" class="type-btn ' + (t.id===activeType?'active':'') + '" data-type="' + t.id + '">' +
+      '<span class="tb-icon">' + t.icon + '</span>' + t.label + '</button>'
+    ).join('');
+    $('typeGrid').querySelectorAll('.type-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        activeType = btn.dataset.type;
+        renderTypeGrid();
+        renderDynamicFields();
+        updatePreview();
+      });
+    });
+  }
+
+  function renderDynamicFields(){
+    const t = typeMeta(activeType);
+    let html = '';
+    if(t.kind === 'count'){
+      html = '<div class="field"><label>How many</label>' +
+        '<div class="stepper">' +
+        '<button type="button" id="stepDown">−</button>' +
+        '<input type="number" id="countInput" min="1" value="1">' +
+        '<button type="button" id="stepUp">+</button>' +
+        '</div></div>';
+    } else if(t.kind === 'grade'){
+      html = '<div class="field"><label for="subjectInput">Class / subject</label>' +
+        '<input type="text" id="subjectInput" placeholder="e.g. R/ELA"></div>' +
+        '<div class="field"><label for="tierSelect">Grade range</label>' +
+        '<select id="tierSelect">' +
+        '<option value="grade90">90 and above</option>' +
+        '<option value="grade80">80–89</option>' +
+        '<option value="grade70">70–79 (no change)</option>' +
+        '<option value="gradeBelow70">Below 70</option>' +
+        '</select></div>';
+    } else if(t.kind === 'flag'){
+      html = '<div class="field"><label for="severitySelect">Severity</label>' +
+        '<select id="severitySelect">' +
+        '<option value="flagMinor">Minor — step 1 classroom warning</option>' +
+        '<option value="flagFormal">Formal — documented referral</option>' +
+        '<option value="flagMajor">Major — suspension / ALC placement</option>' +
+        '</select></div>';
+    } else if(t.kind === 'bonus'){
+      html = '<div class="field"><p style="font-size:12.5px;color:var(--text-mid);margin:0;">Award this once at the end of a week with zero tardies, zero absences, and no missing work.</p></div>';
+    }
+    $('dynamicFields').innerHTML = html;
+
+    if(t.kind === 'count'){
+      $('stepDown').addEventListener('click', ()=>{
+        const inp = $('countInput'); inp.value = Math.max(1, parseInt(inp.value||1)-1); updatePreview();
+      });
+      $('stepUp').addEventListener('click', ()=>{
+        const inp = $('countInput'); inp.value = parseInt(inp.value||1)+1; updatePreview();
+      });
+      $('countInput').addEventListener('input', updatePreview);
+    }
+    if(t.kind === 'grade'){
+      $('tierSelect').addEventListener('change', updatePreview);
+    }
+    if(t.kind === 'flag'){
+      $('severitySelect').addEventListener('change', updatePreview);
+    }
+  }
+
+  function computeDelta(){
+    const t = typeMeta(activeType);
+    const cfg = state.config;
+    if(t.kind === 'count'){
+      const count = parseInt(($('countInput') && $('countInput').value) || 1);
+      return { delta: cfg[t.cfgKey]*count, count };
+    }
+    if(t.kind === 'grade'){
+      const tier = $('tierSelect') ? $('tierSelect').value : 'grade90';
+      return { delta: cfg[tier], tier };
+    }
+    if(t.kind === 'flag'){
+      const sev = $('severitySelect') ? $('severitySelect').value : 'flagMinor';
+      return { delta: cfg[sev], sev };
+    }
+    if(t.kind === 'bonus'){
+      return { delta: cfg.perfectWeekBonus };
+    }
+    return { delta: 0 };
+  }
+
+  function updatePreview(){
+    const { delta } = computeDelta();
+    const el = $('previewDelta');
+    const cls = delta > 0 ? 'delta-pos' : delta < 0 ? 'delta-neg' : 'delta-zero';
+    const sign = delta > 0 ? '+' : '';
+    const pct = Math.abs(delta/GOAL*100);
+    el.innerHTML = '<span class="' + cls + '">' + sign + fmtMoney(delta) + '</span> <span style="color:var(--text-dim);">(' + pct.toFixed(1) + '% of goal)</span>';
+  }
+
+  function entryLabel(entry){
+    const t = typeMeta(entry.type);
+    if(entry.type === 'grade'){
+      const tierNames = {grade90:'90+',grade80:'80–89',grade70:'70–79',gradeBelow70:'below 70'};
+      return 'Grade (' + tierNames[entry.tier] + ')' + (entry.subject ? ' — ' + entry.subject : '');
+    }
+    if(entry.type === 'flag'){
+      const sevNames = {flagMinor:'Minor flag',flagFormal:'Formal referral',flagMajor:'Major disciplinary action'};
+      return sevNames[entry.sev];
+    }
+    if(entry.type === 'count' || t.kind === 'count'){
+      const c = entry.count && entry.count > 1 ? entry.count + '× ' : '';
+      return c + t.label;
+    }
+    return t.label;
+  }
+
+  function renderLedger(){
+    const list = $('ledgerList');
+    if(state.entries.length === 0){
+      list.innerHTML = '<div class="ledger-empty">Nothing logged yet — add the first entry.</div>';
+      return;
+    }
+    const sorted = [...state.entries].sort((a,b)=> b.timestamp - a.timestamp);
+    list.innerHTML = sorted.map(e=>{
+      const t = typeMeta(e.type);
+      const cls = e.delta > 0 ? 'delta-pos' : e.delta < 0 ? 'delta-neg' : 'delta-zero';
+      const sign = e.delta > 0 ? '+' : '';
+      const pct = Math.abs(e.delta/GOAL*100);
+      return '<div class="entry">' +
+        '<div class="entry-left">' +
+          '<div class="entry-icon">' + t.icon + '</div>' +
+          '<div>' +
+            '<div class="entry-label">' + entryLabel(e) + '</div>' +
+            (e.note ? '<div class="entry-note">' + escapeHtml(e.note) + '</div>' : '') +
+            '<div class="entry-date">' + e.date + '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="entry-right">' +
+          '<div class="delta-chip ' + cls + '">' + sign + fmtMoney(e.delta) + '</div>' +
+          '<div class="entry-pct">' + pct.toFixed(1) + '% of goal</div>' +
+          (unlocked ? '<button class="del-btn" data-id="' + e.id + '">delete</button>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+    list.querySelectorAll('.del-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        await deleteEntryFromDb(btn.dataset.id);
+      });
+    });
+  }
+
+  function escapeHtml(s){
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function renderSettings(){
+    const grid = $('settingsGrid');
+    grid.innerHTML = Object.keys(DEFAULT_CONFIG).map(key=>{
+      return '<label for="cfg-'+key+'">' + CONFIG_LABELS[key] + '</label>' +
+        '<input type="number" id="cfg-' + key + '" value="' + state.config[key] + '">';
+    }).join('');
+    const pinField = $('cfg-pin');
+    if(pinField) pinField.value = state.pin;
+  }
+
+  async function handleSubmit(){
+    if(!unlocked) return;
+    const { delta, count, tier, sev } = computeDelta();
+    const entry = {
+      type: activeType,
+      delta: delta,
+      note: $('noteInput').value.trim(),
+      date: $('dateInput').value || new Date().toISOString().slice(0,10),
+      timestamp: Date.now()
+    };
+    if(activeType === 'grade'){
+      entry.tier = tier;
+      entry.subject = ($('subjectInput') && $('subjectInput').value.trim()) || '';
+    }
+    if(activeType === 'flag'){
+      entry.sev = sev;
+    }
+    if(count) entry.count = count;
+
+    await addEntryToDb(entry);
+    $('noteInput').value = '';
+  }
+
+  function renderLock(){
+    const lockBtn = $('lockToggle');
+    const gateArea = $('lockGateArea');
+    const formArea = $('logFormArea');
+    const settingsToggle = $('settingsToggle');
+    const settingsPanel = $('settingsPanel');
+    const settingsLockedNote = $('settingsLockedNote');
+
+    if(unlocked){
+      lockBtn.textContent = '🔓 Unlocked';
+      lockBtn.classList.add('is-unlocked');
+      gateArea.innerHTML = '';
+      formArea.style.display = 'block';
+      settingsToggle.style.display = 'inline-block';
+      settingsLockedNote.style.display = 'none';
+    } else {
+      lockBtn.textContent = '🔒 Dad only';
+      lockBtn.classList.remove('is-unlocked');
+      formArea.style.display = 'none';
+      settingsToggle.style.display = 'none';
+      settingsPanel.classList.remove('open');
+      settingsLockedNote.style.display = 'block';
+      gateArea.innerHTML =
+        '<div class="lock-gate">' +
+          '<div class="lg-icon">🔒</div>' +
+          'Only Dad can add or edit entries.<br>Ask him to unlock this section.' +
+          '<div class="pin-row">' +
+            '<input type="password" id="pinInput" inputmode="numeric" placeholder="PIN">' +
+            '<button type="button" id="pinGo">Unlock</button>' +
+          '</div>' +
+          '<div class="pin-error" id="pinError"></div>' +
+        '</div>';
+      $('pinGo').addEventListener('click', tryUnlock);
+      $('pinInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryUnlock(); });
+    }
+  }
+
+  function tryUnlock(){
+    const val = ($('pinInput').value || '').trim();
+    if(val === state.pin){
+      unlocked = true;
+      renderLock();
+      renderSettings();
+    } else {
+      $('pinError').textContent = 'Wrong PIN — try again.';
+      $('pinInput').value = '';
+      $('pinInput').focus();
+    }
+  }
+
+  function render(){
+    renderHero();
+    renderBuild();
+    renderLedger();
+    renderSettings();
+    renderLock();
+    updatePreview();
+  }
+
+  // wire static controls
+  $('dateInput').value = new Date().toISOString().slice(0,10);
+  $('submitBtn').addEventListener('click', handleSubmit);
+  $('settingsToggle').addEventListener('click', ()=>{
+    $('settingsPanel').classList.toggle('open');
+  });
+  $('settingsSave').addEventListener('click', async ()=>{
+    if(!unlocked) return;
+    const updates = {};
+    Object.keys(DEFAULT_CONFIG).forEach(key=>{
+      const inp = $('cfg-'+key);
+      if(inp) updates[key] = parseFloat(inp.value) || 0;
+    });
+    const pinField = $('cfg-pin');
+    if(pinField && pinField.value.trim()) updates.pin = pinField.value.trim();
+    await saveConfigToDb(updates);
+    $('settingsPanel').classList.remove('open');
+  });
+  $('lockToggle').addEventListener('click', ()=>{
+    if(unlocked){
+      unlocked = false;
+      render();
+    } else {
+      renderLock();
+      setTimeout(()=>{ const pi = $('pinInput'); if(pi) pi.focus(); }, 0);
+    }
+  });
+
+  renderTypeGrid();
+  renderDynamicFields();
+  startLiveSync();
+})();
+</script>
+</body>
+</html>
